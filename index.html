@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Álgebra Express</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    #board {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .cell {
+      width: 70px;
+      height: 70px;
+      border: 2px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .Inicio { background: lightgreen; }
+    .Meta { background: gold; }
+    .Normal { background: lightblue; }
+    .Suma { background: pink; }
+    .Resta { background: lightcoral; }
+    .Multiplicacion { background: orange; }
+    .Division { background: violet; }
+    .Reto { background: khaki; }
+    .Comodin { background: lightgray; }
+    .player {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      margin-top: 5px;
+    }
+    #controls {
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      border: none;
+      background: #3498db;
+      color: white;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    #log {
+      margin-top: 20px;
+      padding: 10px;
+      border: 2px dashed #aaa;
+      min-height: 80px;
+      background: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎲 Álgebra Express 🎲</h1>
+  <div id="board"></div>
+
+  <div id="controls">
+    <button onclick="rollDice()">Lanzar dado</button>
+    <p id="diceResult"></p>
+  </div>
+
+  <div id="log"></div>
+
+  <script>
+    const symbols = [
+      "Inicio", "Suma", "Normal", "Resta", "Reto",
+      "Normal", "Multiplicacion", "Normal", "Division",
+      "Comodin", "Normal", "Reto", "Meta"
+    ];
+
+    const board = document.getElementById("board");
+    const log = document.getElementById("log");
+
+    // Crear tablero
+    symbols.forEach((s, i) => {
+      let cell = document.createElement("div");
+      cell.classList.add("cell");
+      if (s === "Inicio") cell.classList.add("Inicio");
+      else if (s === "Meta") cell.classList.add("Meta");
+      else if (s === "Normal") cell.classList.add("Normal");
+      else if (s === "Suma") cell.classList.add("Suma");
+      else if (s === "Resta") cell.classList.add("Resta");
+      else if (s === "Multiplicacion") cell.classList.add("Multiplicacion");
+      else if (s === "Division") cell.classList.add("Division");
+      else if (s === "Reto") cell.classList.add("Reto");
+      else if (s === "Comodin") cell.classList.add("Comodin");
+      cell.innerHTML = s;
+      board.appendChild(cell);
+    });
+
+    // Jugadores
+    const players = [
+      { name: "J1", pos: 0, color: "red" },
+      { name: "J2", pos: 0, color: "blue" },
+      { name: "J3", pos: 0, color: "green" },
+      { name: "J4", pos: 0, color: "purple" }
+    ];
+    let currentPlayer = 0;
+
+    function renderPlayers() {
+      document.querySelectorAll(".cell").forEach(c => c.innerHTML = "");
+      symbols.forEach((s, i) => {
+        let cell = document.querySelectorAll(".cell")[i];
+        cell.innerHTML = s;
+      });
+      players.forEach(p => {
+        let cell = document.querySelectorAll(".cell")[p.pos];
+        let token = document.createElement("div");
+        token.classList.add("player");
+        token.style.background = p.color;
+        cell.appendChild(token);
+      });
+    }
+    renderPlayers();
+
+    function rollDice() {
+      let dice = Math.floor(Math.random() * 6) + 1;
+      document.getElementById("diceResult").innerText = `Dado: ${dice}`;
+      let player = players[currentPlayer];
+      player.pos += dice;
+      if (player.pos >= symbols.length - 1) {
+        player.pos = symbols.length - 1;
+        log.innerHTML += `<p>🎉 ${player.name} llegó a la Meta y ganó!</p>`;
+        renderPlayers();
+        return;
+      }
+      renderPlayers();
+      let casilla = symbols[player.pos];
+      log.innerHTML += `<p>${player.name} cayó en casilla: ${casilla}</p>`;
+      mostrarAccion(casilla);
+      currentPlayer = (currentPlayer + 1) % players.length;
+    }
+
+    function mostrarAccion(casilla) {
+      let carta = "";
+      if (casilla === "Normal") {
+        carta = "Resuelve: 3x² + 2x − (x² + 4x)";
+      } else if (casilla === "Reto") {
+        carta = "Clasifica: 5x³ − 2x² + 7";
+      } else if (casilla === "Suma") {
+        carta = "Resuelve: (2x + 3x)";
+      } else if (casilla === "Resta") {
+        carta = "Resuelve: (5a² − 2a²)";
+      } else if (casilla === "Multiplicacion") {
+        carta = "Resuelve: (2x)(3x²)";
+      } else if (casilla === "Division") {
+        carta = "Resuelve: (6x² ÷ 3x)";
+      } else if (casilla === "Comodin") {
+        carta = "¡Avanza hasta la próxima casilla Comodín!";
+      }
+      if (carta) {
+        log.innerHTML += `<p>🃏 Carta: ${carta}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
